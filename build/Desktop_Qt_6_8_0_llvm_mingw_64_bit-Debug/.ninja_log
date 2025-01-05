@@ -1,0 +1,10 @@
+# ninja log v6
+2	122	7577804571739054	CMakeFiles/project_code.dir/main.c.obj	b4bf415c8d266301
+7	213	7577804571791645	CMakeFiles/project_code.dir/student.c.obj	180e01e9d3a74e3d
+15	251	7577804571867749	CMakeFiles/project_code.dir/fees.c.obj	ade3bf397f6aa04d
+11	261	7577804571827813	CMakeFiles/project_code.dir/faculty.c.obj	6ebf206c71b2706
+25	262	7577804571968845	CMakeFiles/project_code.dir/main1.c.obj	b33a3dc337e77a
+21	262	7577804571918969	CMakeFiles/project_code.dir/section.c.obj	77e25b9d4108754e
+30	263	7577804572015755	CMakeFiles/project_code.dir/fileoperation.c.obj	c4d42a5c643c2879
+34	263	7577804572051537	CMakeFiles/project_code.dir/admin.c.obj	8c0a30948ea8e98e
+263	363	7577804574346035	project_code.exe	cd580deffc48ce0f
