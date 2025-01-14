@@ -1,72 +1,42 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "fileoperation.h"
-#include "fees.h"
 #include "student.h"
+#include "fees.h"
 
 struct Fees *feesHead = NULL;
 
-void insertFees(int studentID, int receipt_number, float paid_amount) {
-    struct Student *student = NULL;
+struct Student *findStudentById(struct StudentList *students, int studentId) {
+    if (students == NULL || students->head == NULL) {
+        return NULL;
+    }
 
-    struct Student *temp = studentHead;
+    struct Student *temp = students->head;
     while (temp != NULL) {
-        if (temp->id == studentID) {
-            student = temp;
-            break;
+        if (temp->id == studentId) {
+            return temp;
         }
         temp = temp->next;
     }
+    return NULL;
+}
 
+void insertFeestostudent(struct StudentList *students, int receiptNumber, float paidAmount, int studentId) {
+    struct Student *student = findStudentById(students, studentId);
     if (student == NULL) {
-        printf("Student with ID %d not found!\n", studentID);
+        printf("Error: Student with ID %d not found!\n", studentId);
         return;
     }
-
     struct Fees *newFees = (struct Fees *)malloc(sizeof(struct Fees));
     if (!newFees) {
-        printf("Memory allocation failed!\n");
+        printf("Error: Memory allocation failed for Fees node!\n");
         exit(EXIT_FAILURE);
     }
-
+    newFees->receiptNumber = receiptNumber;
+    newFees->paidAmount = paidAmount;
     newFees->studentDetails = student;
-    newFees->receipt_number = receipt_number;
-    newFees->paid_amount = paid_amount;
     newFees->next = NULL;
 
-    addFeesToList(newFees);
-    writeFeesToFile("fees.dat");
-    printf("Fee record for student ID %d added successfully and written to file!\n", studentID);
-}
-
-void displayFeesDetails() {
-    if (feesHead == NULL) {
-        printf("No fee records available.\n");
-        return;
-    }
-
-    printf("\nFees Details:\n");
-
-    struct Fees *temp = feesHead;
-    while (temp != NULL) {
-        printf("Receipt Number: %d, Paid Amount: %.2f\n", temp->receipt_number, temp->paid_amount);
-
-        if (temp->studentDetails != NULL) {
-            struct Student *student = temp->studentDetails;
-            printf("Student ID: %d, Name: %s, Age: %d, Contact Number: %s\n",
-                   student->id,
-                   student->name,
-                   student->age,
-                   student->contactNumber);
-        } else {
-            printf("No student details available.\n");
-        }
-
-        temp = temp->next;
-    }
-}
-
-void addFeesToList(struct Fees *newFees) {
     if (feesHead == NULL) {
         feesHead = newFees;
     } else {
@@ -77,6 +47,56 @@ void addFeesToList(struct Fees *newFees) {
         temp->next = newFees;
     }
 
-    writeFeesToFile("fees.dat");
+    printf("Fees record added successfully for Student ID %d.\n", studentId);
+    writeFeesToFile(newFees);
 }
+
+void displayFees(){
+    // printf("In, displayFees:: %p %p.\n", &feesHead, feesHead);
+    if (feesHead == NULL) {
+        printf("No fees records available.\n");
+        return;
+    }
+
+    printf("\n--- Fees Details ---\n");
+    struct Fees *temp = feesHead;
+
+    while (temp != NULL) {
+        printf("Receipt Number: %d\n", temp->receiptNumber);
+        printf("Paid Amount: %.2f\n", temp->paidAmount);
+
+        if (temp->studentDetails != NULL) {
+            struct Student *student = temp->studentDetails;
+            printf("Student Details:\n");
+            printf("  ID: %d\n", student->id);
+            printf("  Name: %s\n", student->name);
+            printf("  Age: %d\n", student->age);
+            printf("  Contact Number: %s\n", student->contactNumber);
+        } else {
+            printf("Error: Associated student details not found.\n");
+        }
+
+        printf("\n");
+        temp = temp->next;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

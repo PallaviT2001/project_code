@@ -1,32 +1,33 @@
 #ifndef FILEOPERATION_H
 #define FILEOPERATION_H
-#include "student.h"
-#include "faculty.h"
-#include "section.h"
-#include "fees.h"
-#include <stdio.h>
+#include<stdio.h>
 
-FILE *openFile(const char *filename);
-struct Student *findStudentById(int student_id);
+#define studentFile "students.txt"
+#define facultyFile "faculty.txt"
 
-void loadStudentFromFile(const char *filename);
-void writeToStudentFile(const char *filename);
-void updateStudentInFile(const char *filename, int student_id, const char *newName, int newAge, const char *newContact);
-long findStudentPosition(FILE *file, int student_id);
-void deleteStudentInFile(const char *filename, int student_id);
+void openStudentFileForReadingWriting();
+void addStudentToFile(struct StudentList * students, struct Student *newStudent);
+void deleteStudentInFile(struct StudentList * students, int id);
+void updateStudentFieldInFile(struct StudentList * students, int id, int fieldToUpdate, const char *newValue);
+void loadStudentRecords(struct StudentList *list);
+void closeStudentFile();
 
-void loadFacultyFromFile(const char *filename);
-void writeFacultyToFile(const char *filename);
-long findFacultyPosition(FILE *file, int faculty_id);
-void deleteFacultyInFile(const char *filename, int faculty_id);
-void updateFacultyInFile(const char *filename, int faculty_id, const char *newName, const char *newDepartment, int newAge, const char *newQualification);
+void openFacultyFileForReadingWriting();
+void addFacultyToFile(struct FacultyList *list, struct Faculty newFaculty);
+void deleteFacultyInFile(struct FacultyList *list, int facultyID);
+void updateFacultyFieldInFile(struct FacultyList *list, int facultyID, int field, void *newValue);
+void loadFacultyRecords(struct FacultyList *list);
+void closeFacultyFile();
 
-void loadSectionFromFile(const char *filename);
-void writeSectionToFile(const char *filename);
+void writeFeesToFile(struct Fees *newFees);
+void loadFees(struct Fees **feesHead, struct StudentList *students);
+void openFeesFileForReadingWriting();
+void closeFeesFile();
 
-void loadFeesFromFile(const char *filename);
-void writeFeesToFile(const char *filename);
-
-
+void openSectionFileForReadingWriting();
+void closeSectionFile();
+void writeSectionToFile(struct Section *newSection);
+void loadSections(struct Section **sectionHead, struct StudentList *students);
 
 #endif
+

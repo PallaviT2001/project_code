@@ -7,20 +7,22 @@ struct Faculty {
     char department[50];
     int age;
     char qualification[50];
+    char status;
     struct Faculty *next;
 };
-extern struct Faculty *facultyHead;
 
-void insertFaculty(int id, const char *name, const char *department, int age, const char *qualification);
-void deleteFaculty(int id);
-void updateFaculty(int id);
-void displayFacultyDetails();
-void sortFacultiesByID();
-void sortFacultiesByName();
-void searchFacultyById(int id);
-void addFacultyToList(struct Faculty *newFaculty);
-int getTotalFacultyCount();
-struct Faculty* mergeFacultySortedLists(struct Faculty* left, struct Faculty* right);
-struct Faculty* getFacultyMiddle(struct Faculty* head);
+struct FacultyList {
+    struct Faculty *head;
+    int facultyCount;
+};
+
+void insertFaculty(struct FacultyList *facultyList, int id, const char *name, const char *department, int age, const char *qualification);
+void deleteFaculty(struct FacultyList *facultyList, int id);
+void updateFaculty(struct FacultyList *facultyList, int id);
+void displayFacultyDetails(struct FacultyList *facultyList);
+void sortFacultiesByID(struct FacultyList *facultyList);
+void sortFacultiesByName(struct FacultyList *facultyList);
+int getTotalFacultyCount(struct FacultyList *facultyList);
+void searchFacultyById(struct FacultyList *facultyList, int id);
 
 #endif

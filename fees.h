@@ -2,17 +2,16 @@
 #define FEES_H
 #include "student.h"
 
+extern struct Fees *feesHead;
+
 struct Fees {
-    int receipt_number;
-    float paid_amount;
+    int receiptNumber;
+    float paidAmount;
     struct Student *studentDetails;
     struct Fees *next;
 };
 
-extern struct Fees *feesHead;
-
-void insertFees(int studentID, int receipt_number, float paid_amount);
-void displayFeesDetails();
-void addFeesToList(struct Fees *newFees);
+void insertFeestostudent(struct StudentList *students, int receiptNumber, float paidAmount, int studentId);
+void displayFees();
 
 #endif
