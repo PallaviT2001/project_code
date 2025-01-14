@@ -6,21 +6,22 @@ struct Student {
     char name[50];
     int age;
     char contactNumber[20];
+    char status;
     struct Student *next;
 };
-extern struct Student *studentHead;
+struct StudentList {
+    struct Student *head;
+    int studentCount;
+};
 
-void insertStudent(int id, const char *name, int age, const char *contactNumber);
-void deleteStudent(int id);
-void updateStudent(int id);
-void displayStudentDetails();
-void sortStudentsByID();
-void sortStudentsByName();
-void addStudentToList(struct Student *newStudent);
-int getTotalStudentCount();
-void searchStudentById(int id);
-
-struct Student* mergeSortedLists(struct Student* left, struct Student* right);
-struct Student* getMiddle(struct Student* head);
+void insertStudent(struct StudentList * students,int id, const char *name, int age, const char *contactNumber);
+void deleteStudent(struct StudentList * students,int id);
+void updateStudent(struct StudentList * students,int id);
+void displayStudentDetails(struct StudentList * students);
+void sortStudentsByID(struct StudentList * students);
+void sortStudentsByName(struct StudentList * students);
+void searchStudentById(struct StudentList * students,int id);
+int getTotalStudentCount(struct StudentList * students);
 
 #endif
+

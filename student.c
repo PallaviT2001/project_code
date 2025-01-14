@@ -4,11 +4,11 @@
 #include "student.h"
 #include "fileoperation.h"
 
-struct Student *studentHead = NULL;
-
-void insertStudent(int id, const char *name, int age, const char *contactNumber) {
+void insertStudent(struct StudentList * students,int id, const char *name, int age, const char *contactNumber)
+{
     struct Student *newStudent = (struct Student *)malloc(sizeof(struct Student));
-    if (!newStudent) {
+    if (!newStudent)
+    {
         printf("Memory allocation failed!\n");
         exit(EXIT_FAILURE);
     }
@@ -18,29 +18,30 @@ void insertStudent(int id, const char *name, int age, const char *contactNumber)
     newStudent->age = age;
     strncpy(newStudent->contactNumber, contactNumber, sizeof(newStudent->contactNumber) - 1);
     newStudent->contactNumber[sizeof(newStudent->contactNumber) - 1] = '\0';
+    newStudent->status = 'A';  // Set status to 'A' (active)
     newStudent->next = NULL;
 
-    if (studentHead == NULL || strcmp(studentHead->name, newStudent->name) > 0) {
-        newStudent->next = studentHead;
-        studentHead = newStudent;
+    if (students->head == NULL || strcmp(students->head->name, newStudent->name) > 0) {
+        newStudent->next = students->head;
+        students->head= newStudent;
     } else {
-        struct Student *current = studentHead;
+        struct Student *current = students->head;
         while (current->next != NULL && strcmp(current->next->name, newStudent->name) < 0) {
             current = current->next;
         }
         newStudent->next = current->next;
         current->next = newStudent;
     }
-    writeToStudentFile("students.dat");
+    addStudentToFile(students->head, newStudent);
 }
 
-void deleteStudent(int id) {
-    if (studentHead == NULL) {
+void deleteStudent(struct StudentList * students,int id) {
+    if (students->head == NULL) {
         printf("Student list is empty.\n");
         return;
     }
 
-    struct Student *temp = studentHead, *prev = NULL;
+    struct Student *temp = students->head, *prev = NULL;
     while (temp != NULL && temp->id != id) {
         prev = temp;
         temp = temp->next;
@@ -51,67 +52,71 @@ void deleteStudent(int id) {
         return;
     }
     if (prev == NULL) {
-        studentHead = temp->next;
+        students->head = temp->next;
     } else {
         prev->next = temp->next;
     }
-
+    deleteStudentInFile(students->head, id);
     free(temp);
-    printf("Student deleted successfully!\n");
-    deleteStudentInFile("students.dat", id);
+    printf("Student deleted from the list and marked as deleted in the file.\n");
 }
 
-void updateStudent(int id) {
-    struct Student *temp = studentHead;
-
-    while (temp != NULL && temp->id != id) {
+void updateStudent(struct StudentList * students, int id)
+{
+    struct Student *temp = students->head;
+    while (temp != NULL && temp->id != id)
+    {
         temp = temp->next;
     }
+    if (temp != NULL)
+    {
+        int choice;
+        printf("Select the field to update:\n");
+        printf("1. Name\n");
+        printf("2. Age\n");
+        printf("3. Contact Number\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
 
-    if (temp == NULL) {
+        char newValue[50];
+        switch (choice) {
+        case 1:
+            printf("Enter new name: ");
+            scanf(" %[^\n]", newValue);
+            snprintf(temp->name, sizeof(temp->name), "%s", newValue);
+            updateStudentFieldInFile(students->head, id, 1, newValue);
+            break;
+        case 2:
+            printf("Enter new age: ");
+            scanf("%d", &temp->age);
+            snprintf(newValue, sizeof(newValue), "%d", temp->age);
+            updateStudentFieldInFile(students->head, id, 2, newValue);
+            break;
+        case 3:
+            printf("Enter new contact number: ");
+            scanf(" %[^\n]", newValue);
+            snprintf(temp->contactNumber, sizeof(temp->contactNumber), "%s", newValue);
+            updateStudentFieldInFile(students->head, id, 3, newValue);
+            break;
+        default:
+            printf("Invalid choice! Please select a valid option.\n");
+            return;
+        }
+         printf("Student updated successfully!\n");
+    }
+    else {
         printf("Student with ID %d not found!\n", id);
-        return;
     }
-
-    int choice;
-    printf("Select the field to update:\n");
-    printf("1. Name\n");
-    printf("2. Age\n");
-    printf("3. Contact Number\n");
-    printf("Enter your choice: ");
-    scanf("%d", &choice);
-
-    switch (choice) {
-    case 1:
-        printf("Enter new name: ");
-        scanf(" %[^\n]", temp->name);
-        updateStudentInFile("students.dat", id, temp->name, temp->age, temp->contactNumber);
-        break;
-    case 2:
-        printf("Enter new age: ");
-        scanf("%d", &temp->age);
-        updateStudentInFile("students.dat", id, temp->name, temp->age, temp->contactNumber);
-        break;
-    case 3:
-        printf("Enter new contact number: ");
-        scanf(" %[^\n]", temp->contactNumber);
-        updateStudentInFile("students.dat", id, temp->name, temp->age, temp->contactNumber);
-        break;
-    default:
-        printf("Invalid choice! Please select a valid option.\n");
-        return;
-    }
-    printf("Student updated successfully!\n");
 }
 
-void displayStudentDetails() {
-    if (studentHead == NULL) {
+void displayStudentDetails(struct StudentList * students) {
+    if (students->head == NULL) {
         printf("No students found!\n");
         return;
     }
 
     printf("------Student Details:------\n");
-    struct Student *temp = studentHead;
+    struct Student *temp = students->head;
     while (temp != NULL) {
         printf("ID: %d, Name: %s, Age: %d, Contact Number: %s\n",
                temp->id, temp->name, temp->age, temp->contactNumber);
@@ -162,22 +167,22 @@ struct Student* mergeSort(struct Student* head) {
     return mergeSortedLists(left, right);
 }
 
-void sortStudentsByID() {
-    if (studentHead == NULL || studentHead->next == NULL) {
+void sortStudentsByID(struct StudentList * students) {
+    if (students->head== NULL || students->head->next == NULL) {
         printf("Not enough students to sort.\n");
         return;
     }
-    studentHead = mergeSort(studentHead);
+    students->head = mergeSort(students->head);
     printf("Students sorted by ID.\n");
-    displayStudentDetails();
+    displayStudentDetails(students);
 }
 
-void sortStudentsByName() {
-    if (studentHead == NULL || studentHead->next == NULL) {
+void sortStudentsByName(struct StudentList * students) {
+    if (students->head == NULL || students->head == NULL) {
         printf("Not enough students to sort.\n");
         return;
     }
-    for (struct Student *i = studentHead; i != NULL; i = i->next) {
+    for (struct Student *i = students->head; i != NULL; i = i->next) {
         for (struct Student *j = i->next; j != NULL; j = j->next) {
             if (strcmp(i->name, j->name) > 0) {
                 struct Student temp = *i;
@@ -190,11 +195,11 @@ void sortStudentsByName() {
         }
     }
     printf("Students sorted by Name.\n");
-    displayStudentDetails();
+    displayStudentDetails(students);
 }
 
-void searchStudentById(int id) {
-    struct Student *temp = studentHead;
+void searchStudentById(struct StudentList * students,int id) {
+    struct Student *temp = students->head;
 
     while (temp != NULL) {
         if (temp->id == id) {
@@ -208,9 +213,9 @@ void searchStudentById(int id) {
     printf("Student with ID %d not found!\n", id);
 }
 
-int getTotalStudentCount() {
+int getTotalStudentCount(struct StudentList * students) {
     int count = 0;
-    struct Student *temp = studentHead;
+    struct Student *temp = students->head;
     while (temp != NULL) {
         count++;
         temp = temp->next;
@@ -218,5 +223,3 @@ int getTotalStudentCount() {
     return count;
 }
 
-
-//******************************************************************************//

@@ -52,12 +52,22 @@ enum SectionMenuChoice {
     EXIT_SECTION
 };
 
-int mainprogram() {
+int mainprogram()
+{
+    struct StudentList students = {0};
+    struct FacultyList faculty= {0};
 
-    loadStudentFromFile("students.dat");
-    loadFacultyFromFile("faculty_data.txt");
-    loadSectionFromFile("sections.dat");
-    loadFeesFromFile("fees.dat");
+    openStudentFileForReadingWriting();
+    openFacultyFileForReadingWriting();
+    openFeesFileForReadingWriting();
+    openSectionFileForReadingWriting();
+
+    loadStudentRecords(&students);
+    loadFacultyRecords(&faculty);
+    // printf("In, mainprogram::  %p %p.\n", &feesHead, feesHead);
+    loadFees(&feesHead, &students);
+    loadSections(&sectionHead,&students);
+
     if (!adminLogin()) {
         return 1;
     }
@@ -69,7 +79,7 @@ int mainprogram() {
         printf("3. Perform Fees Operations\n");
         printf("4. Perform Section Operations\n");
         //printf("5. Save all data to file\n");
-        printf("5. Exit\n");
+        printf("5. Close files and Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
@@ -101,40 +111,40 @@ int mainprogram() {
                 scanf("%d", &age);
                 printf("Enter student contact number: ");
                 scanf(" %[^\n]", contactNumber);
-                insertStudent(id, name, age, contactNumber);
+                insertStudent(&students,id, name, age, contactNumber);
                 break;
             }
             case DELETE_STUDENT: {
                 int id;
                 printf("Enter student ID to delete: ");
                 scanf("%d", &id);
-                deleteStudent(id);
+                deleteStudent(&students,id);
                 break;
             }
             case UPDATE_STUDENT_DETAILS: {
                 int id;
                 printf("Enter student ID to update: ");
                 scanf("%d", &id);
-                updateStudent(id);
+                updateStudent(&students,id);
                 break;
             }
             case DISPLAY_STUDENTS:
-                displayStudentDetails();
+                displayStudentDetails(&students);
                 break;
             case SORT_STUDENTS_BY_ID:
-                sortStudentsByID();
+                sortStudentsByID(&students);
                 break;
             case SORT_STUDENTS_BY_NAME:
-                sortStudentsByName();
+                sortStudentsByName(&students);
                 break;
             case TOTAL_STUDENT_COUNT:
-                printf("Total student count: %d\n", getTotalStudentCount());
+                printf("Total student count: %d\n", getTotalStudentCount(&students));
                 break;
             case SEARCH_STUDENT:{
                 int id;
                 printf("Enter student ID to search: ");
                 scanf("%d", &id);
-                searchStudentById(id);  // Pass id, not &id
+                searchStudentById(&students,id);
                 break;
             }
             case EXIT_STUDENT:
@@ -175,40 +185,40 @@ int mainprogram() {
                 scanf("%d", &age);
                 printf("Enter faculty qualification: ");
                 scanf(" %[^\n]", qualification);
-                insertFaculty(id, name, department, age, qualification);
+                insertFaculty(&faculty,id, name, department, age, qualification);
                 break;
             }
             case DELETE_FACULTY: {
                 int id;
                 printf("Enter faculty ID to delete: ");
                 scanf("%d", &id);
-                deleteFaculty(id);
+                deleteFaculty(&faculty,id);
                 break;
             }
             case UPDATE_FACULTY_DETAILS: {
                 int id;
                 printf("Enter faculty ID to update: ");
                 scanf("%d", &id);
-                updateFaculty(id);
+                updateFaculty(&faculty,id);
                 break;
             }
             case DISPLAY_FACULTIES:
-                displayFacultyDetails();
+                displayFacultyDetails(&faculty);
                 break;
             case SORT_FACULTIES_BY_ID:
-                sortFacultiesByID();
+                sortFacultiesByID(&faculty);
                 break;
             case SORT_FACULTIES_BY_NAME:
-                sortFacultiesByName();
+                sortFacultiesByName(&faculty);
                 break;
             case TOTAL_FACULTY_COUNT:
-                printf("Total faculty count: %d\n", getTotalFacultyCount());
+                printf("Total faculty count: %d\n", getTotalFacultyCount(&faculty));
                 break;
             case SEARCH_FACULTY:{
                 int id;
                 printf("Enter faculty ID to search: ");
                 scanf("%d", &id);
-                searchFacultyById(id);
+                searchFacultyById(&faculty,id);
                 break;
             }
             case EXIT_STUDENT:
@@ -238,11 +248,11 @@ int mainprogram() {
                 scanf("%d", &receipt_number);
                 printf("Enter paid amount: ");
                 scanf("%f", &paid_amount);
-                insertFees(studentID, receipt_number, paid_amount);
+                insertFeestostudent(&students, receipt_number, paid_amount, studentID);
                 break;
             }
             case DISPLAY_FEES_RECORDS:
-                displayFeesDetails();
+                displayFees();
                 break;
             case EXIT_FEES:
                 printf("Exiting Fees Operations.\n");
@@ -272,11 +282,11 @@ int mainprogram() {
                 scanf("%d", &section_id);
                 printf("Enter section name: ");
                 scanf(" %[^\n]", section_name);
-                insertSection(studentID, section_id, section_name);
+                insertSectionToStudent(&students,section_id,section_name,studentID);
                 break;
             }
             case DISPLAY_SECTIONS:
-                displaySectionDetails();
+                displaySections();
                 break;
             case EXIT_SECTION:
                 printf("Exiting Section Operations.\n");
@@ -287,6 +297,10 @@ int mainprogram() {
             break;
         }
         case EXIT_PROGRAM:
+            closeStudentFile();
+            closeFacultyFile();
+            closeFeesFile();
+            closeSectionFile();
             printf("Exiting the program. Goodbye!\n");
             return 0;
         default:
